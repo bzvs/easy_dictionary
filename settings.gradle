@@ -1,1 +1,12 @@
 rootProject.name = 'easydict'
+
+
+gradle.allprojects {
+    ext {
+        lombokVersion = '1.18.26'
+        apacheCommonLang3Version = '3.12.0'
+        springBootVersion = '3.2.1'
+        jacksonDatatypeVersion = '2.15.2'
+        springKafkaVersion = '3.0.7'
+    }
+}
