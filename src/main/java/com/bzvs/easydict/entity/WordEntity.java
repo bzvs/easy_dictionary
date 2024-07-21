@@ -1,11 +1,18 @@
 package com.bzvs.easydict.entity;
 
-import java.util.List;
+import com.bzvs.easydict.dto.Language;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-public class WordEntity {
+@Entity(name = "word")
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class WordEntity extends BaseEntity {
 
-    private Long id;
-    private String uuid;
     private String value;
-    private List<String> translationUuids;
+    @Enumerated(EnumType.STRING)
+    private Language language;
 }

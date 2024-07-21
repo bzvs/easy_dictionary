@@ -9,14 +9,14 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class WordDto {
-    private UUID uuid;
+@AllArgsConstructor
+@Builder
+public class TranslationDto {
 
-    private String value;
-    private Language language;
+    private UUID uuid;
+    private UUID source;
+    private UUID destination;
     private LocalDateTime createDate;
-    private LocalDateTime updateDate;
+    private LocalDateTime updateTime;
 }
