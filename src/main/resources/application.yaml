@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/easydict?user=postgres&password=slava
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/easydict?user=postgres&password=slava
 
   liquibase:
     change-log: classpath:db/changelog/changelog.xml

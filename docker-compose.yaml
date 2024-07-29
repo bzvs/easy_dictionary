@@ -1,0 +1,28 @@
+version: '3'
+networks:
+  easy-dict-net:
+    driver: bridge
+
+services:
+  easy-dict-service:
+    build:
+      context: .
+    container_name: easy-dict-service
+    depends_on:
+      - db
+    networks:
+      - easy-dict-net
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=${DB_HOST}
+
+  db:
+    image: postgres:13.3
+    container_name: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=slava
+      - POSTGRES_DB=easydict
+    networks:
+      - easy-dict-net
