@@ -1,7 +1,7 @@
 package com.bzvs.easydict.controller;
 
-import com.bzvs.easydict.dto.TranslationRequest;
-import com.bzvs.easydict.dto.TranslationResponse;
+import com.bzvs.easydict.dto.request.TranslationRequest;
+import com.bzvs.easydict.dto.response.TranslationResponse;
 import com.bzvs.easydict.service.api.TranslationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;

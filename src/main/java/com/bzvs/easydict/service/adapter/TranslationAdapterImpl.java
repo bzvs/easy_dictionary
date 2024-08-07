@@ -1,7 +1,7 @@
 package com.bzvs.easydict.service.adapter;
 
-import com.bzvs.easydict.dto.TranslationRequest;
-import com.bzvs.easydict.dto.TranslationResponse;
+import com.bzvs.easydict.dto.request.TranslationRequest;
+import com.bzvs.easydict.dto.response.TranslationResponse;
 import com.bzvs.easydict.service.adapter.api.TranslationAdapter;
 import com.bzvs.easydict.translationapi.NLPApiClient;
 import com.bzvs.easydict.translationapi.nlp.NlpRequest;

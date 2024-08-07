@@ -1,4 +1,4 @@
-package com.bzvs.easydict.dto;
+package com.bzvs.easydict.dto.response;
 
 import lombok.Builder;
 

@@ -5,4 +5,5 @@
 
     <include file="2024_07_21-01-create-word-table.xml" relativeToChangelogFile="true"/>
     <include file="2024_07_21-02-create-translation-table.xml" relativeToChangelogFile="true"/>
+    <include file="2024_08_07-01-create-user-table.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

@@ -1,6 +1,10 @@
 package com.bzvs.easydict.service;
 
-import com.bzvs.easydict.dto.*;
+import com.bzvs.easydict.dto.Language;
+import com.bzvs.easydict.dto.TranslationDto;
+import com.bzvs.easydict.dto.WordDto;
+import com.bzvs.easydict.dto.request.TranslationRequest;
+import com.bzvs.easydict.dto.response.TranslationResponse;
 import com.bzvs.easydict.entity.TranslationEntity;
 import com.bzvs.easydict.mapper.TranslationMapper;
 import com.bzvs.easydict.repository.api.TranslationRepository;
