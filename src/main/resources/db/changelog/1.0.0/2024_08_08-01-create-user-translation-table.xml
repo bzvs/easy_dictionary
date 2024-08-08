@@ -3,22 +3,24 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.15.xsd">
 
-    <changeSet author="bzvs" id="2024_08_07-01-01">
+    <changeSet author="bzvs" id="2024_08_08-01-01">
         <comment>Create translation table</comment>
-        <createTable tableName="user_info">
+        <createTable tableName="user_translation">
             <column name="id" type="serial">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="uuid" type="UUID">
                 <constraints nullable="false"/>
             </column>
-            <column name="email" type="text">
+            <column name="translation_uuid" type="UUID">
                 <constraints nullable="false"/>
             </column>
-            <column name="password" type="text">
+            <column name="user_uuid" type="UUID">
                 <constraints nullable="false"/>
             </column>
-            <column name="telegram" type="text"/>
+            <column name="status" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
             <column name="create_date" type="timestamp">
                 <constraints nullable="false"/>
             </column>

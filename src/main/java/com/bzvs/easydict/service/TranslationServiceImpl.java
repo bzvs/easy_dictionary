@@ -1,8 +1,6 @@
 package com.bzvs.easydict.service;
 
-import com.bzvs.easydict.dto.Language;
-import com.bzvs.easydict.dto.TranslationDto;
-import com.bzvs.easydict.dto.WordDto;
+import com.bzvs.easydict.dto.*;
 import com.bzvs.easydict.dto.request.TranslationRequest;
 import com.bzvs.easydict.dto.response.TranslationResponse;
 import com.bzvs.easydict.entity.TranslationEntity;
@@ -10,6 +8,8 @@ import com.bzvs.easydict.mapper.TranslationMapper;
 import com.bzvs.easydict.repository.api.TranslationRepository;
 import com.bzvs.easydict.service.adapter.api.TranslationAdapter;
 import com.bzvs.easydict.service.api.TranslationService;
+import com.bzvs.easydict.service.api.UserService;
+import com.bzvs.easydict.service.api.UserTranslationService;
 import com.bzvs.easydict.service.api.WordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +27,8 @@ public class TranslationServiceImpl implements TranslationService {
     private final TranslationRepository repository;
     private final TranslationMapper mapper;
     private final WordService wordService;
+    private final UserTranslationService userTranslationService;
+    private final UserService userService;
 
     @Override
     public TranslationResponse translate(TranslationRequest request) {
@@ -42,22 +44,35 @@ public class TranslationServiceImpl implements TranslationService {
         WordDto translatedWord = findTranslationByUuid(wordForTranslation.getUuid(), request.getDestination());
 
         if (Objects.isNull(translatedWord)) {
-            TranslationResponse translated = translationAdapter.translate(request);
-            translatedWord = wordService.add(WordDto.builder()
-                    .value(translated.translation())
-                    .language(request.getDestination())
-                    .createDate(LocalDateTime.now()) // annotation @CreatedDate doesn't work
-                    .build());
-            repository.save(mapper.mapToEntity(TranslationDto.builder()
-                    .source(wordForTranslation.getUuid())
-                    .destination(translatedWord.getUuid())
-                    .createDate(LocalDateTime.now()) // annotation @CreatedDate doesn't work
-                    .build()));
+            translatedWord = addNewTranslation(request, wordForTranslation);
         }
 
         return TranslationResponse.builder()
                 .translation(translatedWord.getValue())
                 .build();
+    }
+
+
+    private WordDto addNewTranslation(TranslationRequest request, WordDto wordForTranslation) {
+        WordDto translatedWord;
+        TranslationResponse translated = translationAdapter.translate(request);
+        translatedWord = wordService.add(WordDto.builder()
+                .value(translated.translation())
+                .language(request.getDestination())
+                .createDate(LocalDateTime.now()) // annotation @CreatedDate doesn't work
+                .build());
+        TranslationEntity savedTranslation = repository.save(mapper.mapToEntity(TranslationDto.builder()
+                .source(wordForTranslation.getUuid())
+                .destination(translatedWord.getUuid())
+                .createDate(LocalDateTime.now()) // annotation @CreatedDate doesn't work
+                .build()));
+        userTranslationService.save(UserTranslationDto.builder()
+                .translationUuid(savedTranslation.getUuid())
+                .userUuid(userService.getCurrentUser().getUuid())
+                .status(UserTranslationStatus.NEW)
+                .createDate(LocalDateTime.now()) // annotation @CreatedDate doesn't work
+                .build());
+        return translatedWord;
     }
 
     private WordDto findTranslationByUuid(UUID uuid, Language language) {

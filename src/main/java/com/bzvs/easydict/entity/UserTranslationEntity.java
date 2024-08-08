@@ -1,19 +1,24 @@
 package com.bzvs.easydict.entity;
 
-import com.bzvs.easydict.dto.Language;
+import com.bzvs.easydict.dto.UserTranslationStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@Entity(name = "word")
+import java.util.UUID;
+
+@Entity(name = "user_translation")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class WordEntity extends BaseEntity {
+public class UserTranslationEntity extends BaseEntity {
 
-    private String value;
+    private UUID translationUuid;
+
+    private UUID userUuid;
 
     @Enumerated(EnumType.STRING)
-    private Language language;
+    private UserTranslationStatus status;
+
 }
