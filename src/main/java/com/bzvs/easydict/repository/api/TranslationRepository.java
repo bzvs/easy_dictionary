@@ -5,10 +5,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface TranslationRepository extends JpaRepository<TranslationEntity, Long> {
 
     @Query("Select t from Translation t where t.source = ?1")
     Collection<TranslationEntity> findTranslation(UUID sourceUuid);
+
+    Optional<TranslationEntity> findBySourceAndDestination(UUID source, UUID destination);
+
+    Collection<TranslationEntity> findByUuidIn(Collection<UUID> uuids);
 }

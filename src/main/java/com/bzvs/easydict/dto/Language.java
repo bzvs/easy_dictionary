@@ -7,8 +7,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum Language {
 
-    RUSSIAN("rus_Cyrl"),
-    ENGLISH("eng_Latn");
+    RUSSIAN("rus_Cyrl", "ru"),
+    ENGLISH("eng_Latn", "en");
 
+    /**
+     * Код для NLP Cloud (NLLB).
+     */
     private final String apiString;
+    /**
+     * Код ISO 639-1 для Google Cloud Translation API.
+     */
+    private final String iso639Code;
 }

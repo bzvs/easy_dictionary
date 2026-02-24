@@ -12,3 +12,10 @@ security:
     secret-key: ${JWT_KEY:2551ba65171f8cf8862632d96c1cc6c75bdffe616aa3890edd34b6edf4408e09}
     expiration-time: 3600000
 
+# Провайдер перевода: nlp (NLP Cloud) или google (Google Cloud Translation API)
+translation:
+  api:
+    provider: ${TRANSLATION_API_PROVIDER:nlp}
+    nlp:
+      url: ${TRANSLATION_NLP_URL:https://api.nlpcloud.io/v1/nllb-200-3-3b}
+      token: ${TRANSLATION_NLP_TOKEN:ec04b7f7a75348d2237f17272bf2d6667f272781}

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -45,6 +46,8 @@ public class TranslationServiceImpl implements TranslationService {
 
         if (Objects.isNull(translatedWord)) {
             translatedWord = addNewTranslation(request, wordForTranslation);
+        } else {
+            ensureUserTranslationSaved(wordForTranslation.getUuid(), translatedWord.getUuid());
         }
 
         return TranslationResponse.builder()
@@ -73,6 +76,21 @@ public class TranslationServiceImpl implements TranslationService {
                 .createDate(LocalDateTime.now()) // annotation @CreatedDate doesn't work
                 .build());
         return translatedWord;
+    }
+
+    private void ensureUserTranslationSaved(UUID sourceWordUuid, UUID destinationWordUuid) {
+        UUID userUuid = userService.getCurrentUser().getUuid();
+        Optional<TranslationEntity> translationOpt = repository.findBySourceAndDestination(sourceWordUuid, destinationWordUuid);
+        if (translationOpt.isEmpty() || userTranslationService.existsByUserAndTranslation(userUuid, translationOpt.get().getUuid())) {
+            return;
+        }
+
+        userTranslationService.save(UserTranslationDto.builder()
+                .translationUuid(translationOpt.get().getUuid())
+                .userUuid(userUuid)
+                .status(UserTranslationStatus.NEW)
+                .createDate(LocalDateTime.now())
+                .build());
     }
 
     private WordDto findTranslationByUuid(UUID uuid, Language language) {

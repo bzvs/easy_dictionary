@@ -14,6 +14,7 @@ import java.util.UUID;
 @Builder
 public class UserTranslationDto {
 
+    private UUID uuid;
     private UUID translationUuid;
     private UUID userUuid;
     private UserTranslationStatus status;
