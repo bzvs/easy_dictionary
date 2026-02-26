@@ -10,7 +10,8 @@ spring:
 security:
   jwt:
     secret-key: ${JWT_KEY:2551ba65171f8cf8862632d96c1cc6c75bdffe616aa3890edd34b6edf4408e09}
-    expiration-time: 3600000
+    expiration-time: 3600000   # access token: 1 час (мс)
+    refresh-expiration-time: 604800000   # refresh token: 7 дней (мс)
 
 # Провайдер перевода: nlp (NLP Cloud) или google (Google Cloud Translation API)
 translation:

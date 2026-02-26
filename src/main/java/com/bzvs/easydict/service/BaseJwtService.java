@@ -24,6 +24,9 @@ public class BaseJwtService implements JwtService {
     @Value("${security.jwt.expiration-time}")
     private long jwtExpiration;
 
+    @Value("${security.jwt.refresh-expiration-time}")
+    private long refreshExpiration;
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -33,24 +36,38 @@ public class BaseJwtService implements JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
-    }
-
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return buildToken(extraClaims, userDetails, jwtExpiration);
+    public String generateAccessToken(UserDetails userDetails) {
+        return buildToken(userDetails, jwtExpiration);
     }
 
     public long getExpirationTime() {
         return jwtExpiration;
     }
 
-    private String buildToken(Map<String, Object> extraClaims,
-                              UserDetails userDetails,
+    @Override
+    public String generateRefreshToken(UserDetails userDetails) {
+        return buildToken(userDetails, refreshExpiration);
+    }
+
+    @Override
+    public boolean isRefreshTokenValid(String token) {
+        try {
+            return !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
+    public long getRefreshExpirationTime() {
+        return refreshExpiration;
+    }
+
+    private String buildToken(UserDetails userDetails,
                               long expiration) {
         return Jwts
                 .builder()
-                .claims(extraClaims)
+                .claims(new HashMap<>())
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))

@@ -37,9 +37,30 @@ public class AuthServiceImpl implements AuthService {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 request.email(), request.password()));
         UserDto user = userService.findByEmail(request.email());
-        String token = jwtService.generateToken(user);
+        String token = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+        return new LoginResponse(
+                token,
+                jwtService.getExpirationTime(),
+                refreshToken,
+                jwtService.getRefreshExpirationTime()
+        );
+    }
 
-
-        return new LoginResponse(token, jwtService.getExpirationTime());
+    @Override
+    public LoginResponse refresh(String refreshToken) {
+        if (refreshToken == null || !jwtService.isRefreshTokenValid(refreshToken)) {
+            throw new IllegalArgumentException("Invalid or expired refresh token");
+        }
+        String email = jwtService.extractUsername(refreshToken);
+        UserDto user = userService.findByEmail(email);
+        String newAccessToken = jwtService.generateAccessToken(user);
+        String newRefreshToken = jwtService.generateRefreshToken(user);
+        return new LoginResponse(
+                newAccessToken,
+                jwtService.getExpirationTime(),
+                newRefreshToken,
+                jwtService.getRefreshExpirationTime()
+        );
     }
 }

@@ -2,6 +2,7 @@ package com.bzvs.easydict.service;
 
 import com.bzvs.easydict.dto.UserDto;
 import com.bzvs.easydict.dto.UserTranslationDto;
+import com.bzvs.easydict.dto.UserTranslationStatus;
 import com.bzvs.easydict.dto.WordDto;
 import com.bzvs.easydict.dto.response.SavedWordResponse;
 import com.bzvs.easydict.entity.TranslationEntity;
@@ -37,12 +38,17 @@ public class UserTranslationServiceImpl implements UserTranslationService {
     }
 
     @Override
-    public List<SavedWordResponse> getSavedWordsForCurrentUser() {
+    public List<SavedWordResponse> getSavedWordsForCurrentUser(UserTranslationStatus statusFilter) {
         List<SavedWordResponse> result = new ArrayList<>();
         UserDto currentUser = userService.getCurrentUser();
         List<UserTranslationEntity> userTranslations = repository.findByUserUuidAndDeletedFalseOrderByCreateDateDesc(currentUser.getUuid());
         if (CollectionUtils.isEmpty(userTranslations)) {
             return result;
+        }
+        if (statusFilter != null) {
+            userTranslations = userTranslations.stream()
+                    .filter(ut -> statusFilter.equals(ut.getStatus() != null ? ut.getStatus() : UserTranslationStatus.NEW))
+                    .toList();
         }
 
         Set<UUID> translationUuids = userTranslations.stream().map(UserTranslationEntity::getTranslationUuid).collect(Collectors.toSet());
@@ -63,14 +69,25 @@ public class UserTranslationServiceImpl implements UserTranslationService {
             if (source == null || dest == null) {
                 continue;
             }
-
+            UserTranslationStatus status = ut.getStatus() != null ? ut.getStatus() : UserTranslationStatus.NEW;
             result.add(new SavedWordResponse(
                     ut.getUuid(),
                     source.getValue(),
                     dest.getValue(),
-                    ut.getCreateDate()));
+                    ut.getCreateDate(),
+                    status));
         }
         return result;
+    }
+
+    @Override
+    @Transactional
+    public void setStatus(UUID userTranslationUuid, UserTranslationStatus status) {
+        UserDto currentUser = userService.getCurrentUser();
+        UserTranslationEntity entity = repository.findByUuidAndUserUuidAndDeletedFalse(userTranslationUuid, currentUser.getUuid())
+                .orElseThrow(() -> new IllegalArgumentException("Запись не найдена"));
+        entity.setStatus(status);
+        repository.save(entity);
     }
 
     @Override

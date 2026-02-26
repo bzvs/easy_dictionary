@@ -7,7 +7,13 @@ public interface JwtService {
 
     boolean isTokenValid(String jwt, UserDetails userDetails);
 
-    String generateToken(UserDetails user);
+    String generateAccessToken(UserDetails user);
+
+    String generateRefreshToken(UserDetails userDetails);
+
+    boolean isRefreshTokenValid(String token);
 
     long getExpirationTime();
+
+    long getRefreshExpirationTime();
 }

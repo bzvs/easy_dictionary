@@ -2,6 +2,7 @@ package com.bzvs.easydict.controller;
 
 import com.bzvs.easydict.dto.UserDto;
 import com.bzvs.easydict.dto.request.LoginRequest;
+import com.bzvs.easydict.dto.request.RefreshTokenRequest;
 import com.bzvs.easydict.dto.request.SignUpRequest;
 import com.bzvs.easydict.dto.response.LoginResponse;
 import com.bzvs.easydict.service.api.AuthService;
@@ -27,5 +28,10 @@ public class AuthController {
     @PostMapping("login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(service.login(request));
+    }
+
+    @PostMapping("refresh")
+    public ResponseEntity<LoginResponse> refresh(@RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(service.refresh(request.refreshToken()));
     }
 }

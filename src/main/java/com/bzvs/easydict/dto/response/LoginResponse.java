@@ -2,5 +2,7 @@ package com.bzvs.easydict.dto.response;
 
 
 public record LoginResponse(String token,
-                            long expiresIn) {
+                            long expiresIn,
+                            String refreshToken,
+                            long refreshExpiresIn) {
 }

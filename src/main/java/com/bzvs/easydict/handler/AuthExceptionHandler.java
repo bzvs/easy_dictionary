@@ -44,6 +44,11 @@ public class AuthExceptionHandler {
             httpCode = HttpStatus.FORBIDDEN;
             description = "The JWT token has expired";
         }
+        if (exception instanceof IllegalArgumentException && exception.getMessage() != null
+                && exception.getMessage().contains("refresh token")) {
+            httpCode = HttpStatus.UNAUTHORIZED;
+            description = "Invalid or expired refresh token";
+        }
 
         ProblemDetail errorDetail = ProblemDetail.forStatusAndDetail(httpCode, exception.getMessage());
         errorDetail.setProperty(DESCRIPTION_PROPERTY, description);
