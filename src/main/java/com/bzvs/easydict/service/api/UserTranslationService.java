@@ -13,6 +13,11 @@ public interface UserTranslationService {
 
     List<SavedWordResponse> getSavedWordsForCurrentUser(UserTranslationStatus statusFilter);
 
+    /** Слова для повторения на сегодня (IN_PROCESS, next_review_at null или <= сейчас), в случайном порядке */
+    List<SavedWordResponse> getWordsForReviewToday();
+
+    void submitReviewResult(UUID userTranslationUuid, boolean remembered);
+
     void setStatus(UUID userTranslationUuid, UserTranslationStatus status);
 
     void deleteSavedTranslation(UUID userTranslationUuid);

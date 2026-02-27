@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -25,6 +26,10 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserTranslationServiceImpl implements UserTranslationService {
+
+    /** Интервалы в днях по уровням SRS (0..5). Уровень 0–1: 1 день, далее 3, 7, 14, 30 */
+    private static final int[] SRS_INTERVAL_DAYS = {1, 1, 3, 7, 14, 30};
+    private static final int SRS_MAX_LEVEL = 5;
 
     private final UserTranslationRepository repository;
     private final UserTranslationMapper mapper;
@@ -39,16 +44,59 @@ public class UserTranslationServiceImpl implements UserTranslationService {
 
     @Override
     public List<SavedWordResponse> getSavedWordsForCurrentUser(UserTranslationStatus statusFilter) {
-        List<SavedWordResponse> result = new ArrayList<>();
         UserDto currentUser = userService.getCurrentUser();
         List<UserTranslationEntity> userTranslations = repository.findByUserUuidAndDeletedFalseOrderByCreateDateDesc(currentUser.getUuid());
         if (CollectionUtils.isEmpty(userTranslations)) {
-            return result;
+            return List.of();
         }
         if (statusFilter != null) {
             userTranslations = userTranslations.stream()
                     .filter(ut -> statusFilter.equals(ut.getStatus() != null ? ut.getStatus() : UserTranslationStatus.NEW))
                     .toList();
+        }
+
+        return buildSavedWordResponses(userTranslations);
+    }
+
+    @Override
+    public List<SavedWordResponse> getWordsForReviewToday() {
+        UserDto currentUser = userService.getCurrentUser();
+        List<UserTranslationEntity> due = repository.findForReviewByUserAndStatusAndDue(
+                currentUser.getUuid(), UserTranslationStatus.IN_PROCESS, LocalDateTime.now());
+        if (CollectionUtils.isEmpty(due)) {
+            return Collections.emptyList();
+        }
+
+        List<SavedWordResponse> list = buildSavedWordResponses(due);
+        Collections.shuffle(list);
+        return list;
+    }
+
+    @Override
+    @Transactional
+    public void submitReviewResult(UUID userTranslationUuid, boolean remembered) {
+        UserDto currentUser = userService.getCurrentUser();
+        UserTranslationEntity entity = repository.findByUuidAndUserUuidAndDeletedFalse(userTranslationUuid, currentUser.getUuid())
+                .orElseThrow(() -> new IllegalArgumentException("Запись не найдена"));
+        int level = entity.getSrsLevel() != null ? Math.min(entity.getSrsLevel(), SRS_MAX_LEVEL) : 0;
+        if (remembered) {
+            level = Math.min(SRS_MAX_LEVEL, level + 1);
+            int intervalDays = SRS_INTERVAL_DAYS[Math.min(level, SRS_INTERVAL_DAYS.length - 1)];
+            entity.setSrsLevel(level);
+            entity.setIntervalDays(intervalDays);
+            entity.setNextReviewAt(LocalDateTime.now().plusDays(intervalDays));
+        } else {
+            entity.setSrsLevel(0);
+            entity.setIntervalDays(SRS_INTERVAL_DAYS[0]);
+            entity.setNextReviewAt(LocalDateTime.now().plusDays(SRS_INTERVAL_DAYS[0]));
+        }
+        repository.save(entity);
+    }
+
+    private List<SavedWordResponse> buildSavedWordResponses(List<UserTranslationEntity> userTranslations) {
+        List<SavedWordResponse> result = new ArrayList<>();
+        if (CollectionUtils.isEmpty(userTranslations)) {
+            return result;
         }
 
         Set<UUID> translationUuids = userTranslations.stream().map(UserTranslationEntity::getTranslationUuid).collect(Collectors.toSet());
@@ -58,7 +106,6 @@ public class UserTranslationServiceImpl implements UserTranslationService {
                 .collect(Collectors.toSet());
         Map<UUID, WordDto> wordsByUuid = wordService.findByUuids(wordUuids).stream()
                 .collect(Collectors.toMap(WordDto::getUuid, Function.identity()));
-
         for (UserTranslationEntity ut : userTranslations) {
             TranslationEntity trans = translations.stream()
                     .filter(t -> t.getUuid().equals(ut.getTranslationUuid()))
@@ -66,9 +113,7 @@ public class UserTranslationServiceImpl implements UserTranslationService {
                     .orElseThrow();
             WordDto source = wordsByUuid.get(trans.getSource());
             WordDto dest = wordsByUuid.get(trans.getDestination());
-            if (source == null || dest == null) {
-                continue;
-            }
+            if (source == null || dest == null) continue;
             UserTranslationStatus status = ut.getStatus() != null ? ut.getStatus() : UserTranslationStatus.NEW;
             result.add(new SavedWordResponse(
                     ut.getUuid(),
