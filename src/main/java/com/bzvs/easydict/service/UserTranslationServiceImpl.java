@@ -109,6 +109,8 @@ public class UserTranslationServiceImpl implements UserTranslationService {
             ReviewEventEntity event = new ReviewEventEntity();
             event.setUuid(UUID.randomUUID());
             event.setUserUuid(userUuid);
+            event.setCreateDate(LocalDateTime.now());
+            event.setUpdateDate(LocalDateTime.now());
             event.setUserTranslationUuid(userTranslationUuid);
             event.setRemembered(remembered);
             event.setMode(mode);
