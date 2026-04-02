@@ -5,9 +5,11 @@ import com.bzvs.easydict.dto.UserTranslationDto;
 import com.bzvs.easydict.dto.UserTranslationStatus;
 import com.bzvs.easydict.dto.WordDto;
 import com.bzvs.easydict.dto.response.SavedWordResponse;
+import com.bzvs.easydict.entity.ReviewEventEntity;
 import com.bzvs.easydict.entity.TranslationEntity;
 import com.bzvs.easydict.entity.UserTranslationEntity;
 import com.bzvs.easydict.mapper.UserTranslationMapper;
+import com.bzvs.easydict.repository.api.ReviewEventRepository;
 import com.bzvs.easydict.repository.api.TranslationRepository;
 import com.bzvs.easydict.repository.api.UserTranslationRepository;
 import com.bzvs.easydict.service.api.UserService;
@@ -36,6 +38,7 @@ public class UserTranslationServiceImpl implements UserTranslationService {
     private final UserService userService;
     private final TranslationRepository translationRepository;
     private final WordService wordService;
+    private final ReviewEventRepository reviewEventRepository;
 
     @Override
     public UserTranslationDto save(UserTranslationDto dto) {
@@ -73,6 +76,13 @@ public class UserTranslationServiceImpl implements UserTranslationService {
     }
 
     @Override
+    public int getWordsForReviewCount(UUID userUuid) {
+        List<UserTranslationEntity> due = repository.findForReviewByUserAndStatusAndDue(
+                userUuid, UserTranslationStatus.IN_PROCESS, LocalDateTime.now());
+        return due != null ? due.size() : 0;
+    }
+
+    @Override
     @Transactional
     public void submitReviewResult(UUID userTranslationUuid, boolean remembered) {
         UserDto currentUser = userService.getCurrentUser();
@@ -91,6 +101,21 @@ public class UserTranslationServiceImpl implements UserTranslationService {
             entity.setNextReviewAt(LocalDateTime.now().plusDays(SRS_INTERVAL_DAYS[0]));
         }
         repository.save(entity);
+        recordReviewEvent(currentUser.getUuid(), entity.getUuid(), remembered, null);
+    }
+
+    private void recordReviewEvent(UUID userUuid, UUID userTranslationUuid, boolean remembered, String mode) {
+        try {
+            ReviewEventEntity event = new ReviewEventEntity();
+            event.setUuid(UUID.randomUUID());
+            event.setUserUuid(userUuid);
+            event.setUserTranslationUuid(userTranslationUuid);
+            event.setRemembered(remembered);
+            event.setMode(mode);
+            reviewEventRepository.save(event);
+        } catch (Exception ignored) {
+            // не ломаем основной поток при ошибке записи статистики
+        }
     }
 
     private List<SavedWordResponse> buildSavedWordResponses(List<UserTranslationEntity> userTranslations) {
@@ -132,6 +157,9 @@ public class UserTranslationServiceImpl implements UserTranslationService {
         UserTranslationEntity entity = repository.findByUuidAndUserUuidAndDeletedFalse(userTranslationUuid, currentUser.getUuid())
                 .orElseThrow(() -> new IllegalArgumentException("Запись не найдена"));
         entity.setStatus(status);
+        if (status == UserTranslationStatus.LEARNED) {
+            entity.setLearnedAt(LocalDateTime.now());
+        }
         repository.save(entity);
     }
 

@@ -13,6 +13,11 @@ security:
     expiration-time: 3600000   # access token: 1 час (мс)
     refresh-expiration-time: 604800000   # refresh token: 7 дней (мс)
 
+# Web Push (VAPID) для напоминаний. Сгенерировать: npx web-push generate-vapid-keys
+web-push:
+  public-key: ${WEB_PUSH_PUBLIC_KEY:}
+  private-key: ${WEB_PUSH_PRIVATE_KEY:}
+
 # Провайдер перевода: nlp (NLP Cloud) или google (Google Cloud Translation API)
 translation:
   api:

@@ -1,5 +1,6 @@
 package com.bzvs.easydict.config;
 
+import com.bzvs.easydict.config.properties.TranslationApiProperties;
 import feign.RequestInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

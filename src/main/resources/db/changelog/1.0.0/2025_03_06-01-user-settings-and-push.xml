@@ -1,0 +1,66 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.15.xsd">
+
+    <changeSet author="bzvs" id="2025_03_06-01-01">
+        <comment>Create user_settings table for notification preferences</comment>
+        <createTable tableName="user_settings">
+            <column name="id" type="serial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uuid" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_uuid" type="UUID">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="notifications_enabled" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reminder_time" type="varchar(5)"/>
+            <column name="reminder_only_if_words" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_reminder_sent_date" type="date"/>
+            <column name="create_date" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_date" type="timestamp"/>
+            <column name="deleted" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="bzvs" id="2025_03_06-01-02">
+        <comment>Create user_push_subscription table for Web Push</comment>
+        <createTable tableName="user_push_subscription">
+            <column name="id" type="serial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uuid" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_uuid" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="endpoint" type="varchar(2048)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="p256dh_key" type="varchar(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="auth_key" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_date" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_date" type="timestamp"/>
+            <column name="deleted" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
