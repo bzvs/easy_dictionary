@@ -8,4 +8,7 @@
     <include file="2024_08_07-01-create-user-table.xml" relativeToChangelogFile="true"/>
     <include file="2024_08_08-01-create-user-translation-table.xml" relativeToChangelogFile="true"/>
     <include file="2025_02_27-01-add-srs-fields-user-translation.xml" relativeToChangelogFile="true"/>
+    <include file="2025_03_06-01-user-settings-and-push.xml" relativeToChangelogFile="true"/>
+    <include file="2025_03_06-02-statistics-and-review-events.xml" relativeToChangelogFile="true"/>
+    <include file="2026_04_02-01-review-event-align-base-entity.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

@@ -1,4 +1,4 @@
-package com.bzvs.easydict.config;
+package com.bzvs.easydict.config.properties;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -2,6 +2,7 @@ package com.bzvs.easydict.service;
 
 import com.bzvs.easydict.dto.Language;
 import com.bzvs.easydict.dto.WordDto;
+import com.bzvs.easydict.entity.WordEntity;
 import com.bzvs.easydict.mapper.WordMapper;
 import com.bzvs.easydict.repository.api.WordRepository;
 import com.bzvs.easydict.service.api.WordService;
@@ -20,12 +21,17 @@ public class WordServiceImpl implements WordService {
 
     @Override
     public WordDto add(WordDto dto) {
-        return mapper.mapToDto(repository.save(mapper.mapToEntity(dto)));
+        WordEntity entity = mapper.mapToEntity(dto);
+        if (entity.getValue() != null) {
+            entity.setValue(entity.getValue().toLowerCase());
+        }
+        return mapper.mapToDto(repository.save(entity));
     }
 
     @Override
     public WordDto findByValue(String value, Language language) {
-        return mapper.mapToDto(repository.findByValueAndLanguage(value, language));
+        String searchValue = value != null ? value.toLowerCase() : null;
+        return mapper.mapToDto(repository.findByValueAndLanguage(searchValue, language));
     }
 
     @Override

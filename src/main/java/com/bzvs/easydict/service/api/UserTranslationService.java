@@ -16,6 +16,9 @@ public interface UserTranslationService {
     /** Слова для повторения на сегодня (IN_PROCESS, next_review_at null или <= сейчас), в случайном порядке */
     List<SavedWordResponse> getWordsForReviewToday();
 
+    /** Количество слов на повторение сегодня для указанного пользователя (для планировщика уведомлений) */
+    int getWordsForReviewCount(UUID userUuid);
+
     void submitReviewResult(UUID userTranslationUuid, boolean remembered);
 
     void setStatus(UUID userTranslationUuid, UserTranslationStatus status);

@@ -1,0 +1,41 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.15.xsd">
+
+    <changeSet author="bzvs" id="2025_03_06-02-01">
+        <comment>Add learned_at to user_translation for "learned in period" stats</comment>
+        <addColumn tableName="user_translation">
+            <column name="learned_at" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="bzvs" id="2025_03_06-02-02">
+        <comment>Create review_event table for training results (correct/incorrect)</comment>
+        <createTable tableName="review_event">
+            <column name="id" type="serial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uuid" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_uuid" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_translation_uuid" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remembered" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="mode" type="varchar(32)"/>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex indexName="idx_review_event_user_created" tableName="review_event">
+            <column name="user_uuid"/>
+            <column name="created_at"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

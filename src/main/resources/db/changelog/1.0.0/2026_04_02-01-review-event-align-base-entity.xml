@@ -1,0 +1,27 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.15.xsd">
+
+    <changeSet author="bzvs" id="2026_04_02-01-01">
+        <comment>Align review_event with BaseEntity: rename created_at, add update_date and deleted</comment>
+        <dropIndex indexName="idx_review_event_user_created" tableName="review_event"/>
+        <renameColumn tableName="review_event" oldColumnName="created_at" newColumnName="create_date"
+                      columnDataType="timestamp"/>
+        <addColumn tableName="review_event">
+            <column name="update_date" type="timestamp"/>
+        </addColumn>
+        <addColumn tableName="review_event">
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>
+            UPDATE review_event SET update_date = create_date WHERE update_date IS NULL;
+        </sql>
+        <createIndex indexName="idx_review_event_user_created" tableName="review_event">
+            <column name="user_uuid"/>
+            <column name="create_date"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

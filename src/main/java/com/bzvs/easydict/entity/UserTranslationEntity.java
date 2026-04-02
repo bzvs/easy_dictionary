@@ -31,4 +31,7 @@ public class UserTranslationEntity extends BaseEntity {
     /** Уровень SRS 1–5 (упрощённая шкала интервалов) */
     private Integer srsLevel;
 
+    /** Когда статус был переведён в LEARNED (для статистики «изучено за период») */
+    private LocalDateTime learnedAt;
+
 }

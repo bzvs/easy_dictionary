@@ -13,6 +13,13 @@ import java.util.UUID;
 
 public interface UserTranslationRepository extends JpaRepository<UserTranslationEntity, Long> {
 
+    long countByUserUuidAndDeletedFalse(UUID userUuid);
+
+    long countByUserUuidAndStatusAndDeletedFalse(UUID userUuid, UserTranslationStatus status);
+
+    long countByUserUuidAndDeletedFalseAndStatusAndLearnedAtGreaterThanEqual(
+            UUID userUuid, UserTranslationStatus status, LocalDateTime learnedAtFrom);
+
     List<UserTranslationEntity> findByUserUuidAndDeletedFalseOrderByCreateDateDesc(UUID userUuid);
 
     @Query("SELECT u FROM user_translation u WHERE u.userUuid = :userUuid AND u.deleted = false AND u.status = :status " +
